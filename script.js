@@ -139,7 +139,7 @@ const keyOf = (id, size) => id + "__" + size;
 async function loadData() {
   const grab = async f => { try { const r = await fetch(f, { cache: "no-cache" }); return r.ok ? (await r.json()).items || [] : []; } catch { return []; } };
   [PRODUCTS, REVIEWS, SOLD] = await Promise.all([
-    grab("data/products.json"), grab("data/reviews.json"), grab("data/sold.json"),
+    grab("/data/products.json"), grab("/data/reviews.json"), grab("/data/sold.json"),
   ]);
 }
 
@@ -657,11 +657,18 @@ function renderSocial() {
    ============================================================ */
 let io;
 function observeReveals(root = document) {
-  if (!("IntersectionObserver" in window)) { $$(".reveal", root).forEach(e => e.classList.add("in")); return; }
+  const els = $$(".reveal:not(.in)", root);
+  if (!("IntersectionObserver" in window)) { els.forEach(e => e.classList.add("in")); return; }
   io ||= new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
   }, { threshold: .12, rootMargin: "0px 0px -40px" });
-  $$(".reveal:not(.in)", root).forEach(e => io.observe(e));
+  const vh = window.innerHeight || 800;
+  els.forEach(e => {
+    // Anything already in (or above) the viewport reveals immediately — no wait
+    // on the observer, so above-the-fold content is never momentarily blank.
+    if (e.getBoundingClientRect().top < vh - 40) e.classList.add("in");
+    else io.observe(e);
+  });
 }
 
 /* ============================================================
@@ -688,6 +695,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   $$("[data-year]").forEach(e => e.textContent = new Date().getFullYear());
   $$("[data-biz-city]").forEach(e => e.textContent = BIZ.city);
   if (ORDER_EMAIL) $$("[data-order-email]").forEach(e => { e.textContent = ORDER_EMAIL; if (e.tagName === "A") e.href = "mailto:" + ORDER_EMAIL; });
+
+  // reveal static above-the-fold content right away (don't wait on the data fetch)
+  observeReveals();
 
   // pull CMS-managed content, then build the cart (needs products to exist)
   await loadData();
