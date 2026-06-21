@@ -6,7 +6,7 @@
 # ============================================================
 backend:
   name: github               # log in with a GitHub Personal Access Token
-  repo: vnbrv7gkg2-cyber/super-resells
+  repo: superresells/super-resells
   branch: main
 
 # Where uploaded photos are saved + how the site references them.
