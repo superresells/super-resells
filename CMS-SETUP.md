@@ -32,18 +32,24 @@ Keeps the **same superresells.netlify.app URL**, just swaps drag-drop for auto-d
 3. Save & deploy. From now on, every change (including ones your brother makes in
    the dashboard) auto-publishes.
 
-## Step 3 — Turn on his login  (≈5 min)
+## Step 3 — The login  (GitHub access token, ≈3 min)
 
-1. Netlify site → **Identity** tab → **Enable Identity**.
-2. **Identity → Registration preferences → Invite only** (so randoms can't sign up).
-3. **Identity → Services → Git Gateway → Enable Git Gateway.**
-4. **Identity → Invite users →** invite **super.resells@yahoo.com**.
-5. He gets an email → clicks **Accept the invite** → it opens the site → he sets a
-   password → he's dropped into **/admin**. Done.
+The dashboard (Sveltia CMS) logs in with a **GitHub Personal Access Token** — no
+extra accounts, no OAuth setup. Generate one once and you're set:
 
-> ⚠️ **If you don't see an "Identity" tab** (Netlify is phasing Identity out for some
-> new sites), don't worry — tell me and I'll switch the dashboard to a **GitHub
-> login** instead (one small config change on my end + a 2-minute step on yours).
+1. On **github.com**, top-right avatar → **Settings** → scroll down to **Developer
+   settings** → **Personal access tokens → Tokens (classic)** → **Generate new
+   token (classic)**.
+2. **Note:** "Super Resells CMS". **Expiration:** "No expiration" (so it never stops
+   working). **Scopes:** check the top-level **`repo`** box.
+3. **Generate token** → **copy it** (you only see it once — keep it private, like a
+   password).
+4. Go to **superresells.netlify.app/admin** → click **"Sign In Using Access Token"**
+   → paste the token → done. He's in the dashboard.
+
+> The token stays saved in his browser, so he won't re-paste it often. If he ever
+> clears his browser or uses a new device, he just signs in with the token again
+> (or generates a fresh one).
 
 ---
 
