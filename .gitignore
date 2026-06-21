@@ -1,0 +1,8 @@
+# Local dev / OS files
+.claude/
+.DS_Store
+**/.DS_Store
+*.zip
+
+# Raw photo originals — unused by the site (cropped versions live in images/p/)
+images/products/

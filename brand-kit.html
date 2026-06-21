@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUPER RESELLS — Brand Kit</title>
+  <meta name="description" content="The SUPER RESELLS brand kit — logos, colors, type, and voice.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%230a0a0b%22/><path d=%22M32 11 L36.5 23.9 L50.1 24.1 L39.2 32.4 L43.2 45.4 L32 37.6 L20.8 45.4 L24.8 32.4 L13.9 24.1 L27.5 23.9 Z%22 fill=%22%23c8a24c%22/></svg>">
+  <style>
+    :root{
+      --ink:#0a0a0b;--ink-2:#111113;--ink-3:#1a1a1d;--line:#26262b;
+      --bone:#f4f1ea;--muted:#9a9aa2;--gold:#c8a24c;--gold-2:#e9c76b;--gold-deep:#9c7a2f;
+      --gold-grad:linear-gradient(135deg,var(--gold-2),var(--gold) 55%,var(--gold-deep));
+      --display:"Anton","Arial Narrow",sans-serif;--body:"Inter",system-ui,sans-serif;
+    }
+    *{box-sizing:border-box;margin:0}
+    body{font-family:var(--body);background:var(--ink);color:var(--bone);line-height:1.6;-webkit-font-smoothing:antialiased}
+    .wrap{width:min(100% - 2.5rem,980px);margin-inline:auto;padding:3rem 0 4rem}
+    h1,h2,h3{font-family:var(--display);font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:.95}
+    h1{font-size:clamp(2.6rem,7vw,4.6rem)}
+    h2{font-size:clamp(1.5rem,3.5vw,2.2rem);margin-bottom:1.3rem}
+    .eyebrow{font-weight:600;font-size:.72rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold)}
+    .gold{background:var(--gold-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+    .muted{color:var(--muted)}
+    section{padding:2.6rem 0;border-top:1px solid var(--line)}
+    .lead{color:var(--muted);max-width:60ch;margin-top:.6rem}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;font-weight:600;font-size:.85rem;letter-spacing:.04em;padding:.7rem 1.3rem;border-radius:4px;border:1px solid var(--line);color:var(--bone);text-decoration:none;cursor:pointer;background:none}
+    .btn.gold{background:var(--gold-grad);color:#1a1505;border-color:transparent}
+    /* logos */
+    .logo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem}
+    .logo-card{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .logo-stage{padding:2.2rem 1.5rem;display:grid;place-items:center;min-height:170px}
+    .logo-stage.dark{background:var(--ink-2)}
+    .logo-stage.light{background:var(--bone)}
+    .logo-stage.gold-bg{background:var(--gold-grad)}
+    .logo-stage img{max-width:100%;max-height:110px}
+    .logo-foot{display:flex;justify-content:space-between;align-items:center;padding:.8rem 1rem;border-top:1px solid var(--line);font-size:.78rem}
+    .logo-foot a{color:var(--gold);text-decoration:none}
+    /* colors */
+    .swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem}
+    .swatch{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .swatch .chip{height:96px}
+    .swatch .info{padding:.8rem .9rem}
+    .swatch .nm{font-weight:600;font-size:.9rem}
+    .swatch .hex{font-size:.8rem;color:var(--muted);letter-spacing:.04em;font-variant-numeric:tabular-nums}
+    .swatch .use{font-size:.72rem;color:var(--muted);margin-top:.3rem}
+    /* type */
+    .type-row{border:1px solid var(--line);border-radius:10px;padding:1.4rem 1.5rem;margin-bottom:1rem}
+    .type-row .label{font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem}
+    .type-display{font-family:var(--display);font-size:clamp(2.2rem,6vw,3.4rem);text-transform:uppercase;line-height:1}
+    .type-body-sample{font-size:1.05rem}
+    .type-meta{font-size:.8rem;color:var(--muted);margin-top:.6rem}
+    /* lists */
+    .cols{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem 2.5rem}
+    .do h3,.dont h3{font-size:1.1rem;margin-bottom:.7rem}
+    .do h3{color:var(--gold)}
+    .dont h3{color:#d36}
+    ul.clean{list-style:none;padding:0}
+    ul.clean li{padding:.35rem 0 .35rem 1.4rem;position:relative;font-size:.92rem;color:var(--muted)}
+    ul.clean li::before{content:"";position:absolute;left:0;top:.95em;width:6px;height:6px;border-radius:50%;background:var(--gold)}
+    .voice li::before{background:var(--gold)}
+    /* tiers */
+    table{width:100%;border-collapse:collapse;font-size:.92rem}
+    th,td{text-align:left;padding:.8rem 1rem;border-bottom:1px solid var(--line)}
+    th{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+    td.off{color:var(--gold);font-weight:700;font-family:var(--display)}
+    .footnote{font-size:.8rem;color:var(--muted);margin-top:3rem;text-align:center}
+    @media(max-width:680px){.cols{grid-template-columns:1fr}}
+    @media print{
+      body{background:#fff;color:#111}
+      .no-print{display:none!important}
+      section{border-color:#ddd;break-inside:avoid}
+      .logo-stage.dark{background:#111}
+      .swatch,.type-row,.logo-card{border-color:#ccc}
+      .muted,.swatch .hex,.swatch .use,.type-meta{color:#555}
+      h1,h2,h3{color:#111}
+      .gold{-webkit-text-fill-color:#9c7a2f;color:#9c7a2f}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="toolbar no-print">
+    <span class="eyebrow">Internal Reference</span>
+    <button class="btn gold" onclick="window.print()">⤓ Print / Save as PDF</button>
+  </div>
+
+  <header style="margin-bottom:1rem">
+    <span class="eyebrow">Brand Kit · v1</span>
+    <h1>SUPER <span class="gold">RESELLS</span></h1>
+    <p class="lead">Curated premium streetwear, shipped nationwide. This sheet is the single source of truth for the look — logos, colors, type, and voice. Keep it consistent and the brand reads expensive everywhere it shows up.</p>
+  </header>
+
+  <!-- LOGOS -->
+  <section>
+    <span class="eyebrow">01 — Logo</span>
+    <h2>The Marks</h2>
+    <div class="logo-grid">
+      <div class="logo-card">
+        <div class="logo-stage dark"><img src="brand/logo-dark.svg" alt="SUPER RESELLS logo on dark"></div>
+        <div class="logo-foot"><span>Primary · on dark</span><a href="brand/logo-dark.svg" download>Download SVG</a></div>
+      </div>
+      <div class="logo-card">
+        <div class="logo-stage light"><img src="brand/logo-light.svg" alt="SUPER RESELLS logo on light"></div>
+        <div class="logo-foot"><span>On light</span><a href="brand/logo-light.svg" download>Download SVG</a></div>
+      </div>
+      <div class="logo-card">
+        <div class="logo-stage dark"><img src="brand/logo-stacked.svg" alt="SUPER RESELLS stacked logo" style="max-height:150px"></div>
+        <div class="logo-foot"><span>Stacked · badge</span><a href="brand/logo-stacked.svg" download>Download SVG</a></div>
+      </div>
+      <div class="logo-card">
+        <div class="logo-stage dark"><img src="brand/mark.svg" alt="SUPER RESELLS star mark" style="max-height:96px"></div>
+        <div class="logo-foot"><span>Star mark · icon</span><a href="brand/mark.svg" download>Download SVG</a></div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:1.2rem">The star = "super." Give the logo room to breathe — keep clear space around it equal to the height of the star mark. Never stretch, recolor the wordmark, or add effects.</p>
+  </section>
+
+  <!-- COLORS -->
+  <section>
+    <span class="eyebrow">02 — Color</span>
+    <h2>Palette</h2>
+    <div class="swatches">
+      <div class="swatch"><div class="chip" style="background:#0a0a0b"></div><div class="info"><div class="nm">Jet Ink</div><div class="hex">#0A0A0B</div><div class="use">Primary background</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#111113"></div><div class="info"><div class="nm">Raised</div><div class="hex">#111113</div><div class="use">Cards &amp; panels</div></div></div>
+      <div class="swatch"><div class="chip" style="background:linear-gradient(135deg,#e9c76b,#c8a24c 55%,#9c7a2f)"></div><div class="info"><div class="nm">Super Gold</div><div class="hex">#C8A24C</div><div class="use">Accent, CTAs, price</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e9c76b"></div><div class="info"><div class="nm">Bright Gold</div><div class="hex">#E9C76B</div><div class="use">Highlights, gradient top</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f4f1ea"></div><div class="info"><div class="nm">Bone</div><div class="hex">#F4F1EA</div><div class="use">Primary text on dark</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#9a9aa2"></div><div class="info"><div class="nm">Muted</div><div class="hex">#9A9AA2</div><div class="use">Secondary text</div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPE -->
+  <section>
+    <span class="eyebrow">03 — Typography</span>
+    <h2>Type</h2>
+    <div class="type-row">
+      <div class="label">Display — Anton</div>
+      <div class="type-display">HAND-PICKED HEAT</div>
+      <div class="type-meta">Headlines, the wordmark, prices. Always uppercase. Heavy and condensed — it carries the plug-energy.</div>
+    </div>
+    <div class="type-row">
+      <div class="label">Body — Inter</div>
+      <div class="type-body-sample">Hand-picked premium graphic heat. Stack the cart, save more — up to 35% off automatic at checkout.</div>
+      <div class="type-meta">Everything else: paragraphs, buttons, labels. Weights 400 / 500 / 600 / 700.</div>
+    </div>
+  </section>
+
+  <!-- VOICE -->
+  <section>
+    <span class="eyebrow">04 — Voice</span>
+    <h2>How We Talk</h2>
+    <ul class="clean voice">
+      <li>Confident, never corny. Premium without being stuffy.</li>
+      <li>Short, punchy lines. Say it like you'd say it to a friend who has taste.</li>
+      <li>Lean on the hooks: <em>hand-picked heat</em>, <em>curated</em>, <em>plug pricing</em>, <em>stack the cart, save more</em>.</li>
+      <li>Ships nationwide — fast and tracked.</li>
+      <li>Low pressure: "send your order, pay when it's confirmed."</li>
+    </ul>
+  </section>
+
+  <!-- USAGE -->
+  <section>
+    <span class="eyebrow">05 — Usage</span>
+    <h2>Do &amp; Don't</h2>
+    <div class="cols">
+      <div class="do">
+        <h3>Do</h3>
+        <ul class="clean">
+          <li>Gold on jet black is the signature — use it everywhere.</li>
+          <li>Keep lots of negative space; let it feel premium.</li>
+          <li>Use the star mark alone as a social avatar / favicon.</li>
+          <li>Shoot product on clean, consistent backgrounds.</li>
+        </ul>
+      </div>
+      <div class="dont">
+        <h3>Don't</h3>
+        <ul class="clean">
+          <li>Don't put gold text on white — use the on-light logo instead.</li>
+          <li>Don't stretch, rotate, or add drop shadows to the logo.</li>
+          <li>Don't swap the fonts or use more than two.</li>
+          <li>Don't crowd the mark with other graphics.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- BULK TIERS -->
+  <section>
+    <span class="eyebrow">06 — Pricing Reference</span>
+    <h2>Bulk Tiers</h2>
+    <table>
+      <thead><tr><th>Quantity</th><th>Who it's for</th><th>Discount</th></tr></thead>
+      <tbody>
+        <tr><td>1–2</td><td>Solo / full price</td><td class="off">—</td></tr>
+        <tr><td>3–5</td><td>Squad starter</td><td class="off">10%</td></tr>
+        <tr><td>6–11</td><td>Crew pricing</td><td class="off">18%</td></tr>
+        <tr><td>12–23</td><td>Team rate</td><td class="off">28%</td></tr>
+        <tr><td>24+</td><td>Wholesale / event</td><td class="off">35%</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-top:1rem">These live in <strong>script.js → BULK_TIERS</strong>. Change them in one place and the whole site updates.</p>
+  </section>
+
+  <p class="footnote">SUPER RESELLS · Brand Kit v1</p>
+</div>
+</body>
+</html>

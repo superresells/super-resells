@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop — SUPER RESELLS | Premium Tees, Hoodies & More</title>
+  <meta name="description" content="Shop SUPER RESELLS — hand-picked premium graphic tees, one-of-a-few drops. Stack the cart for automatic savings. Ships nationwide.">
+  <meta name="theme-color" content="#0a0a0b">
+  <meta property="og:title" content="Shop — SUPER RESELLS">
+  <meta property="og:description" content="Hand-picked graphic heat. Stack the cart, save more — automatically.">
+  <meta property="og:image" content="images/social-card.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 64 64%22><rect width=%2264%22 height=%2264%22 rx=%2212%22 fill=%22%230a0a0b%22/><path d=%22M32 11 L36.5 23.9 L50.1 24.1 L39.2 32.4 L43.2 45.4 L32 37.6 L20.8 45.4 L24.8 32.4 L13.9 24.1 L27.5 23.9 Z%22 fill=%22%23c8a24c%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+  <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+<!-- HEADER -->
+<header class="site-header">
+  <nav class="nav container">
+    <a href="index.html" class="brand" aria-label="SUPER RESELLS home">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#111113" stroke="#26262b"/><path d="M32 14.5 L35.9 25.7 L47.7 25.9 L38.3 33 L41.7 44.4 L32 37.6 L22.3 44.4 L25.7 33 L16.3 25.9 L28.1 25.7 Z" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="64" y2="64"><stop stop-color="#e9c76b"/><stop offset="1" stop-color="#9c7a2f"/></linearGradient></defs></svg>
+      <span class="wordmark"><b>SUPER</b><span>RESELLS</span></span>
+    </a>
+    <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="index.html#bulk">Stack & Save</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="cart-btn" data-open-cart aria-label="Open cart">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18M16 10a4 4 0 0 1-8 0"/></svg>
+        <span class="lbl">Order</span><span class="cart-count">0</span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- PAGE HEAD -->
+<section class="page-head">
+  <div class="container reveal">
+    <span class="eyebrow">The Collection</span>
+    <h1>Shop the Heat</h1>
+    <p class="lead">Every piece is hand-picked premium. Stack what you want — <b style="color:var(--gold)">the price drops automatically</b> with every piece you add. One-of-a-few inventory, so grab it while it's here.</p>
+  </div>
+</section>
+
+<!-- BULK REMINDER BAR -->
+<div class="trust">
+  <div class="container trust-inner">
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 2 for $85</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 3 for $120</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 6 for $180</div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 12 for $300</div>
+  </div>
+</div>
+
+<!-- PRODUCT GRID -->
+<section class="section">
+  <div class="container">
+    <div class="shop-toolbar" id="shopToolbar"></div>
+    <div class="grid-products" id="shopGrid"></div>
+    <p class="form-hint" style="margin-top:2.5rem">Looking for something specific or a piece you saw on our IG? <a href="contact.html" style="color:var(--gold)">DM us — we'll source it →</a></p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <a href="index.html" class="brand"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#111113" stroke="#26262b"/><path d="M32 14.5 L35.9 25.7 L47.7 25.9 L38.3 33 L41.7 44.4 L32 37.6 L22.3 44.4 L25.7 33 L16.3 25.9 L28.1 25.7 Z" fill="#c8a24c"/></svg><span class="wordmark"><b>SUPER</b><span>RESELLS</span></span></a>
+        <p>Curated premium streetwear — hand-picked graphic heat, shipped nationwide, priced fair.</p>
+        <div class="foot-social" id="footSocial"></div>
+      </div>
+      <div class="foot-col"><h4>Shop</h4><a href="shop.html">All Products</a><a href="shop.html">New Arrivals</a><a href="index.html#bulk">Stack & Save</a><a href="contact.html">Custom Requests</a></div>
+      <div class="foot-col"><h4>Company</h4><a href="about.html">About</a><a href="contact.html">Contact</a><a href="contact.html">Bulk &amp; Custom Orders</a><a data-order-email href="#">Email Us</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span data-year></span> SUPER RESELLS</span>
+      <span>Curated with intent. Worn with pride.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="cartDrawer" aria-label="Your order">
+  <div class="drawer-head"><h3>Your Order</h3><button class="drawer-close" data-close-cart aria-label="Close">×</button></div>
+  <div class="drawer-body" id="cartBody"></div>
+  <div class="drawer-foot" id="cartFoot"></div>
+</aside>
+
+<!-- MODAL -->
+<div class="modal-scrim" id="modalScrim"><div class="modal" id="modalContent"></div></div>
+
+<!-- MOBILE STICKY CTA -->
+<div class="mobile-cta">
+  <button class="btn btn-gold" data-open-cart>View Order</button>
+  <a href="contact.html" class="btn btn-ghost">Custom?</a>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

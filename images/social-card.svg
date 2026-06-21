@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#e9c76b"/><stop offset="0.55" stop-color="#c8a24c"/><stop offset="1" stop-color="#9c7a2f"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="0%" r="80%">
+      <stop stop-color="#c8a24c" stop-opacity="0.18"/><stop offset="0.7" stop-color="#0a0a0b" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M48 0H0V48" fill="none" stroke="#26262b" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#0a0a0b"/>
+  <rect width="1200" height="630" fill="url(#grid)" opacity="0.5"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <!-- star mark -->
+  <g transform="translate(600 150)">
+    <path d="M0 -55 L13 -18 L52 -16 L20 8 L31 47 L0 23 L-31 47 L-20 8 L-52 -16 L-13 -18 Z" fill="url(#g)"/>
+  </g>
+  <text x="600" y="350" text-anchor="middle" font-family="Anton, Arial Narrow, sans-serif" font-size="130" fill="#f4f1ea" letter-spacing="4">SUPER RESELLS</text>
+  <text x="600" y="420" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="30" fill="#c8a24c" letter-spacing="8">HAND-PICKED HEAT · SHIPS NATIONWIDE</text>
+  <text x="600" y="500" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="26" fill="#9a9aa2">Stack the cart, save more — as low as $22 a piece.</text>
+</svg>

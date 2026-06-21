@@ -1,0 +1,87 @@
+# ============================================================
+#  SUPER RESELLS — admin dashboard config (Decap CMS)
+#  This powers the dashboard at /admin where the store is managed.
+#  After connecting GitHub + Netlify, set "branch" below to your
+#  repo's default branch if it isn't "main".
+# ============================================================
+backend:
+  name: git-gateway          # uses Netlify Identity login (email/password)
+  branch: main
+
+# Where uploaded photos are saved + how the site references them.
+media_folder: "images/p"
+public_folder: "/images/p"
+
+# Friendlier editor experience
+publish_mode: simple
+site_url: https://superresells.netlify.app
+display_url: https://superresells.netlify.app
+logo_url: https://superresells.netlify.app/images/social-card.svg
+
+collections:
+  # -------- PRODUCTS --------
+  - name: shop
+    label: "🛍️  Shop Products"
+    description: "Add, edit, or delete products. Drop sold-out sizes."
+    files:
+      - name: products
+        label: "All Products"
+        file: "data/products.json"
+        format: json
+        fields:
+          - name: items
+            label: "Products"
+            label_singular: "Product"
+            widget: list
+            summary: "{{fields.name}}  ·  {{fields.cat}}  ·  {{fields.sizes}}"
+            fields:
+              - { name: name, label: "Title / Name", widget: string }
+              - { name: id, label: "ID (unique short code)", widget: string, hint: "e.g. hs25 — must be unique, don't reuse another product's ID" }
+              - { name: price, label: "Price ($)", widget: number, default: 50, value_type: int, min: 1 }
+              - { name: cat, label: "Color", widget: select, options: ["Black", "White", "Blue", "Tan"], default: "Black" }
+              - { name: badge, label: "Badge", widget: select, required: false, default: "", options: ["", "Just Dropped", "Best Seller", "Last One", "Limited"] }
+              - { name: sizes, label: "Sizes IN STOCK", widget: select, multiple: true, default: ["M"], options: ["S", "M", "L", "XL", "2XL", "One Size"], hint: "Uncheck a size the moment it sells out." }
+              - { name: img, label: "Front photo", widget: image, required: false, choose_url: false }
+              - { name: back, label: "Back photo (shows on hover)", widget: image, required: false, choose_url: false }
+              - { name: colors, label: "Print description", widget: string, required: false, hint: "e.g. Black · Pink print" }
+              - { name: desc, label: "Description", widget: text, required: false }
+
+  # -------- REVIEWS --------
+  - name: reviews
+    label: "⭐  Reviews"
+    description: "Customer reviews get emailed to you first — add the good ones here to publish them."
+    files:
+      - name: reviews
+        label: "Published Reviews"
+        file: "data/reviews.json"
+        format: json
+        fields:
+          - name: items
+            label: "Reviews"
+            label_singular: "Review"
+            widget: list
+            summary: "{{fields.who}} — {{fields.stars}}★"
+            fields:
+              - { name: stars, label: "Stars (1–5)", widget: number, default: 5, value_type: int, min: 1, max: 5 }
+              - { name: who, label: "Name", widget: string }
+              - { name: where, label: "Location (optional)", widget: string, required: false }
+              - { name: text, label: "Review", widget: text }
+
+  # -------- SOLD WALL --------
+  - name: sold
+    label: "🔥  Sold-Out Wall"
+    description: "When a piece sells, delete it from Products and add it here to show on 'Recently Copped'."
+    files:
+      - name: sold
+        label: "Recently Sold"
+        file: "data/sold.json"
+        format: json
+        fields:
+          - name: items
+            label: "Sold pieces"
+            label_singular: "Sold piece"
+            widget: list
+            summary: "{{fields.name}}"
+            fields:
+              - { name: name, label: "Name", widget: string }
+              - { name: img, label: "Photo", widget: image, required: false, choose_url: false }
