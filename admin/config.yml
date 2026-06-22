@@ -34,10 +34,11 @@ collections:
             label: "Products"
             label_singular: "Product"
             widget: list
-            summary: "{{fields.name}}  ·  {{fields.cat}}  ·  {{fields.sizes}}"
+            collapsed: true
+            summary: "{{fields.name}}  ·  ${{fields.price}}  ·  {{fields.cat}}  ·  {{fields.sizes}}"
             fields:
               - { name: name, label: "Title / Name", widget: string }
-              - { name: id, label: "ID (unique short code)", widget: string, hint: "e.g. hs25 — must be unique, don't reuse another product's ID" }
+              - { name: id, label: "ID (auto-generated)", widget: uuid, prefix: "hs-" }
               - { name: price, label: "Price ($)", widget: number, default: 50, value_type: int, min: 1 }
               - { name: cat, label: "Color", widget: select, options: ["Black", "White", "Blue", "Tan"], default: "Black" }
               - { name: badge, label: "Badge", widget: select, required: false, default: "", options: ["", "Just Dropped", "Best Seller", "Last One", "Limited"] }
@@ -61,6 +62,7 @@ collections:
             label: "Reviews"
             label_singular: "Review"
             widget: list
+            collapsed: true
             summary: "{{fields.who}} — {{fields.stars}}★"
             fields:
               - { name: stars, label: "Stars (1–5)", widget: number, default: 5, value_type: int, min: 1, max: 5 }
@@ -82,7 +84,53 @@ collections:
             label: "Sold pieces"
             label_singular: "Sold piece"
             widget: list
+            collapsed: true
             summary: "{{fields.name}}"
             fields:
               - { name: name, label: "Name", widget: string }
               - { name: img, label: "Photo", widget: image, required: false, choose_url: false }
+
+  # -------- STORE SETTINGS --------
+  - name: settings
+    label: "⚙️  Store Settings"
+    description: "Change pricing, contact info, social handles, and homepage copy — no code. Hit Publish to go live."
+    files:
+      - name: settings
+        label: "Settings"
+        file: "data/settings.json"
+        format: json
+        fields:
+          - name: pricing
+            label: "Stack Pricing"
+            widget: object
+            fields:
+              - { name: basePrice, label: "Single-piece price ($)", widget: number, value_type: int, min: 1, default: 50, hint: "What one shirt costs on its own." }
+              - name: table
+                label: "Quantity deals  (buy X → pay $Y total)"
+                widget: list
+                label_singular: "Price row"
+                collapsed: false
+                summary: "{{fields.qty}} for ${{fields.price}}"
+                hint: "The whole 'X for $Y' deal sheet. In-between amounts fill in automatically."
+                fields:
+                  - { name: qty, label: "Quantity", widget: number, value_type: int, min: 1 }
+                  - { name: price, label: "Total price ($)", widget: number, value_type: int, min: 1 }
+          - name: contact
+            label: "Contact / Orders"
+            widget: object
+            fields:
+              - { name: orderEmail, label: "Order email", widget: string, hint: "Where order requests are sent + shown to customers." }
+              - { name: orderPhone, label: "Phone (optional)", widget: string, required: false, hint: "Leave blank to hide it." }
+              - { name: formspreeId, label: "Formspree form ID", widget: string, required: false, hint: "From formspree.io — powers the auto-emailed orders & contact form." }
+          - name: social
+            label: "Social handles"
+            widget: object
+            fields:
+              - { name: instagram, label: "Instagram handle", widget: string, required: false, hint: "Just the handle, no @. Blank hides the icon." }
+              - { name: tiktok, label: "TikTok handle", widget: string, required: false, hint: "Just the handle, no @. Blank hides the icon." }
+          - name: copy
+            label: "Homepage Copy"
+            widget: object
+            fields:
+              - { name: heroEyebrow, label: "Hero tagline (small line above the big headline)", widget: string, required: false }
+              - { name: heroLead, label: "Hero paragraph (under the headline)", widget: text, required: false }

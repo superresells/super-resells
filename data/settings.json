@@ -1,0 +1,35 @@
+{
+  "pricing": {
+    "basePrice": 50,
+    "table": [
+      { "qty": 1, "price": 50 },
+      { "qty": 2, "price": 85 },
+      { "qty": 3, "price": 120 },
+      { "qty": 4, "price": 140 },
+      { "qty": 5, "price": 160 },
+      { "qty": 6, "price": 180 },
+      { "qty": 7, "price": 200 },
+      { "qty": 8, "price": 220 },
+      { "qty": 9, "price": 240 },
+      { "qty": 10, "price": 260 },
+      { "qty": 12, "price": 300 },
+      { "qty": 15, "price": 360 },
+      { "qty": 20, "price": 460 },
+      { "qty": 25, "price": 550 },
+      { "qty": 30, "price": 660 }
+    ]
+  },
+  "contact": {
+    "orderEmail": "super.resells@yahoo.com",
+    "orderPhone": "",
+    "formspreeId": "maqgwqrr"
+  },
+  "social": {
+    "instagram": "supe.rresells",
+    "tiktok": "supe.rresells"
+  },
+  "copy": {
+    "heroEyebrow": "Curated Streetwear Plug · Ships Nationwide",
+    "heroLead": "Every piece is sourced one-of-a-few — real graphic heat you can't find at the mall. Stack the cart with multiple drops and the per-shirt price falls automatically."
+  }
+}

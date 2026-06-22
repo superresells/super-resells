@@ -20,8 +20,8 @@ let PRODUCTS = [];   // managed in the CMS — loaded at runtime from data/produ
    piece is one flat single price). Edit a row and the whole site
    updates — slider, cart, checkout, toast, all of it.
    ------------------------------------------------------------ */
-const BASE_PRICE = 50;                         // single-piece price
-const PRICE_TABLE = [                          // [ quantity, total price ]
+let BASE_PRICE = 50;                           // single-piece price (editable in Store Settings)
+let PRICE_TABLE = [                            // [ quantity, total price ] (editable in Store Settings)
   [1, 50], [2, 85], [3, 120], [4, 140], [5, 160], [6, 180], [7, 200],
   [8, 220], [9, 240], [10, 260], [12, 300], [15, 360], [20, 460],
   [25, 550], [30, 660],
@@ -43,9 +43,9 @@ const STACK_MILESTONES = [
    ▸ ORDER_EMAIL / ORDER_PHONE: shown to customers + used by the
      email fallback. Replace with his real contact info.
    ------------------------------------------------------------ */
-const FORMSPREE_ID = "maqgwqrr";               // orders auto-send to super.resells@yahoo.com
-const ORDER_EMAIL  = "super.resells@yahoo.com"; // his real inbox
-const ORDER_PHONE  = "";                         // optional, e.g. "(512) 555-0142"
+let FORMSPREE_ID = "maqgwqrr";                  // orders auto-send here (editable in Store Settings)
+let ORDER_EMAIL  = "super.resells@yahoo.com";   // his real inbox (editable in Store Settings)
+let ORDER_PHONE  = "";                            // optional (editable in Store Settings)
 const BIZ = { name: "SUPER RESELLS", city: "Buda / Kyle, TX" };
 
 /* ------------------------------------------------------------
@@ -137,10 +137,53 @@ const keyOf = (id, size) => id + "__" + size;
 // Load CMS-managed content (products, reviews, sold) from /data at startup.
 // Falls back to empty so the page never hard-crashes if a file is missing.
 async function loadData() {
-  const grab = async f => { try { const r = await fetch(f, { cache: "no-cache" }); return r.ok ? (await r.json()).items || [] : []; } catch { return []; } };
-  [PRODUCTS, REVIEWS, SOLD] = await Promise.all([
-    grab("/data/products.json"), grab("/data/reviews.json"), grab("/data/sold.json"),
+  const grab = async f => { try { const r = await fetch(f, { cache: "no-cache" }); return r.ok ? await r.json() : null; } catch { return null; } };
+  const [prod, rev, sld, settings] = await Promise.all([
+    grab("/data/products.json"), grab("/data/reviews.json"), grab("/data/sold.json"), grab("/data/settings.json"),
   ]);
+  PRODUCTS = (prod && prod.items) || [];
+  REVIEWS  = (rev  && rev.items)  || [];
+  SOLD     = (sld  && sld.items)  || [];
+  // safety net: every product needs a unique id (cart keys depend on it)
+  const seen = {};
+  PRODUCTS.forEach((p, i) => {
+    let id = (p.id || "").toString().trim();
+    if (!id) id = (p.name ? p.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") : "") || "item";
+    if (seen[id]) id += "-" + i;
+    seen[id] = true; p.id = id;
+  });
+  if (settings) applySettings(settings);
+}
+
+// Apply editable Store Settings (data/settings.json) over the code defaults.
+// Anything missing or invalid is ignored, so the site always has safe values.
+function applySettings(s) {
+  try {
+    if (s.pricing) {
+      if (Number.isFinite(s.pricing.basePrice) && s.pricing.basePrice > 0) BASE_PRICE = s.pricing.basePrice;
+      if (Array.isArray(s.pricing.table)) {
+        const rows = s.pricing.table
+          .filter(r => r && Number.isFinite(r.qty) && Number.isFinite(r.price) && r.qty > 0 && r.price > 0)
+          .map(r => [r.qty, r.price])
+          .sort((a, b) => a[0] - b[0]);
+        if (rows.length) PRICE_TABLE = rows;
+      }
+    }
+    if (s.contact) {
+      if (typeof s.contact.formspreeId === "string") FORMSPREE_ID = s.contact.formspreeId.trim();
+      if (s.contact.orderEmail) ORDER_EMAIL = String(s.contact.orderEmail).trim();
+      if (typeof s.contact.orderPhone === "string") ORDER_PHONE = s.contact.orderPhone.trim();
+    }
+    if (s.social) {
+      if (typeof s.social.instagram === "string") SOCIAL.instagram = s.social.instagram.trim();
+      if (typeof s.social.tiktok === "string") SOCIAL.tiktok = s.social.tiktok.trim();
+    }
+    if (s.copy) {
+      const set = (id, val) => { const el = document.getElementById(id); if (el && typeof val === "string" && val.trim()) el.textContent = val.trim(); };
+      set("heroEyebrow", s.copy.heroEyebrow);
+      set("heroLead", s.copy.heroLead);
+    }
+  } catch (e) { /* bad settings → keep code defaults */ }
 }
 
 let cart = [];
