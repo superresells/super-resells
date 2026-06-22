@@ -768,7 +768,7 @@ function flashAdd(btn) {
   const MUSIC = {
     src: "audio/track.mp3", // your royalty-free track goes here
     placeholder: true,      // true = built-in NBA YoungBoy-style trap beat | false = play the .mp3
-    volume: 0.32,           // 0–1, kept low so it sits under the page
+    volume: 0.36,           // 0–1, kept low so it sits under the page
   };
 
   const STORE_KEY = "hs_music_on";
@@ -848,10 +848,10 @@ function flashAdd(btn) {
       32: 523.25, 36: 440.00, 40: 392.00, 44: 440.00,          // F : C5 A4 G4 A4
       48: 493.88, 52: 415.30, 56: 329.63, 60: 415.30,          // E : B4 G#4 E4 G#4
     };
-    // soft-saturation curve → gives the 808 its grit
+    // saturation curve → harmonics that make the 808 audible/felt on small speakers
     const sat = (() => {
       const n = 1024, c = new Float32Array(n);
-      for (let i = 0; i < n; i++) { const x = (i / n) * 2 - 1; c[i] = Math.tanh(x * 2); }
+      for (let i = 0; i < n; i++) { const x = (i / n) * 2 - 1; c[i] = Math.tanh(x * 3.2); }
       return c;
     })();
 
@@ -882,12 +882,20 @@ function flashAdd(btn) {
       o.frequency.exponentialRampToValueAtTime(48, t + 0.10);
       env(o, t, 0.9, 0.34); o.start(t); o.stop(t + 0.36);
     }
-    function sub808(freq, t, dur) { // 808 with a slide into the note
+    function sub808(freq, t, dur) { // hard 808: pitch-drop knock + saturated sub, long boom
       const o = ctx.createOscillator(); o.type = "sine";
-      o.frequency.setValueAtTime(freq * 1.5, t);
-      o.frequency.exponentialRampToValueAtTime(freq, t + 0.06);
-      const sh = ctx.createWaveShaper(); sh.curve = sat;
-      o.connect(sh); env(sh, t, 0.55, dur, 0.004); o.start(t); o.stop(t + dur + 0.05);
+      o.frequency.setValueAtTime(freq * 2, t);                  // attack blip…
+      o.frequency.exponentialRampToValueAtTime(freq, t + 0.04); // …fast drop = the knock
+      const sh = ctx.createWaveShaper(); sh.curve = sat;        // grit / harmonics
+      const tone = ctx.createBiquadFilter();                    // tame the harsh top
+      tone.type = "lowpass"; tone.frequency.value = 3500; tone.Q.value = 0.6;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.95, t + 0.006);     // hard attack
+      g.gain.setValueAtTime(0.95, t + 0.06);                    // hold…
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);     // …then long boom tail
+      o.connect(sh); sh.connect(tone); tone.connect(g); g.connect(master);
+      o.start(t); o.stop(t + dur + 0.05);
     }
     function clap(t) { // layered noise bursts = snappy clap on the backbeat
       for (const off of [0, 0.012, 0.024]) {
