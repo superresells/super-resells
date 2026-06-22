@@ -1,4 +1,4 @@
-# HEIR STANDARD — store guide
+# SUPER RESELLS — store guide
 
 A premium streetwear storefront. Customers browse, add to an order, and send
 it — **no online payment**. You confirm availability + total, then collect
@@ -10,8 +10,8 @@ Everything you'll normally touch lives in **`script.js`**, right at the top.
 
 ## 1. Change the products
 
-**The easy way → the Store Manager dashboard.** Once it's connected (see
-**`CMS-SETUP.md`**), your brother just goes to `superresells.netlify.app/admin`,
+**The easy way → the Store Manager dashboard.** It's already connected (see
+**`CMS-SETUP.md`**), so your brother just goes to `super-resells.pages.dev/admin`,
 logs in, and adds/edits/deletes products — renaming titles, dragging in photos,
 checking which **sizes are in stock** — then hits **Publish**. No code.
 
@@ -97,12 +97,38 @@ The same setup also powers the Contact page form.
 
 ---
 
-## 4. Put it online (free)
+## 4. It's already online (Cloudflare Pages)
 
-1. Go to **netlify.com** → log in.
-2. Drag this whole `heir-standard` folder onto the page.
-3. It's live in ~20 seconds. Rename the site under Site settings.
-   (Or buy a domain like `heirstandard.com` and point it there.)
+The site is **live at https://super-resells.pages.dev**, hosted free on
+**Cloudflare Pages** and connected to the GitHub repo `superresells/super-resells`.
+
+**You don't deploy by hand.** Any change to the `main` branch auto-publishes in
+about a minute. That includes:
+- edits your brother makes in the **dashboard** (they save to GitHub), and
+- code/file changes you commit and **push with GitHub Desktop**.
+
+> Want a custom domain like `superresells.com`? Buy one, then in Cloudflare →
+> your Pages project → **Custom domains** → add it. (The free `.pages.dev`
+> address keeps working too.)
+
+---
+
+## 5. Keeping the site secure
+
+It's a static site with no logins or database on it, so there's very little to
+break into. The protections in place:
+
+- **`_headers`** ships security headers on every page (blocks clickjacking,
+  content/script injection, MIME sniffing). Don't delete this file.
+- **The dashboard can only be used with a private GitHub token.** Anyone can
+  *open* `/admin`, but nobody can change anything without it.
+- **Do these two things to stay safe:** turn on **2-factor authentication** on
+  the GitHub account, and keep the access token private (revoke + regenerate it
+  on GitHub if it ever leaks). Details in `CMS-SETUP.md`.
+- **Form spam:** turn on **reCAPTCHA** in your Formspree dashboard to stop bots
+  on the order/contact forms.
+- **Optional extra:** Cloudflare's free **Bot Fight Mode** (dashboard →
+  Security) adds automatic bot blocking.
 
 ---
 
