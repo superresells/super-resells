@@ -746,3 +746,220 @@ function flashAdd(btn) {
   btn.classList.add("added"); btn.innerHTML = "✓ Added";
   setTimeout(() => { btn.classList.remove("added"); btn.innerHTML = orig; }, 1100);
 }
+
+/* ============================================================
+   BACKGROUND MUSIC  —  floating play / mute toggle (site-wide)
+   ------------------------------------------------------------
+   • Off by default — browsers block autoplay-with-sound, and a
+     surprise track makes shoppers bounce. Visitor taps to start.
+   • Choice is remembered across pages for the session. If they
+     had it on, it picks back up on their next click after a page
+     change (browsers won't let it auto-restart silently).
+
+   >>> GOING LIVE WITH A REAL TRACK <<<
+   1. Drop a royalty-free hip hop .mp3 into  audio/track.mp3
+      (free, sounds-the-part sources: pixabay.com/music,
+       uppbeat.io, chosic.com — search "trap" / "lofi hip hop".
+       Use one licensed for commercial/web use.)
+   2. Set  placeholder: false  in the MUSIC config just below.
+   That's it — the synth demo beat is replaced by your file.
+   ============================================================ */
+(function () {
+  const MUSIC = {
+    src: "audio/track.mp3", // your royalty-free track goes here
+    placeholder: true,      // true = built-in demo beat | false = play the .mp3
+    volume: 0.32,           // 0–1, kept low so it sits under the page
+  };
+
+  const STORE_KEY = "hs_music_on";
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---- styles (injected so it works on every page) ---------- */
+  const style = document.createElement("style");
+  style.textContent = `
+    .hs-music{position:fixed;left:18px;bottom:18px;z-index:80;width:48px;height:48px;
+      display:flex;align-items:center;justify-content:center;border-radius:50%;
+      background:var(--ink-2,#111113);border:1px solid var(--line,#26262b);
+      color:var(--muted,#9a9aa2);cursor:pointer;transition:border-color .2s,color .2s,box-shadow .3s;
+      -webkit-tap-highlight-color:transparent}
+    .hs-music:hover{border-color:var(--gold,#c8a24c);color:var(--gold,#c8a24c)}
+    .hs-music:focus-visible{outline:2px solid var(--gold,#c8a24c);outline-offset:2px}
+    .hs-music svg{width:20px;height:20px;display:block}
+    .hs-music .hs-eq{display:none;align-items:flex-end;gap:2px;height:16px}
+    .hs-music .hs-eq span{width:3px;height:6px;background:currentColor;border-radius:2px;
+      animation:hsEq .9s ease-in-out infinite}
+    .hs-music .hs-eq span:nth-child(2){animation-delay:.2s}
+    .hs-music .hs-eq span:nth-child(3){animation-delay:.4s}
+    .hs-music .hs-eq span:nth-child(4){animation-delay:.1s}
+    .hs-music.is-on{color:var(--gold,#c8a24c);border-color:var(--gold,#c8a24c);
+      box-shadow:0 0 0 1px var(--gold,#c8a24c),0 6px 22px -6px rgba(200,162,76,.5)}
+    .hs-music.is-on .hs-ico{display:none}
+    .hs-music.is-on .hs-eq{display:flex}
+    .hs-music::after{content:attr(data-label);position:absolute;left:58px;white-space:nowrap;
+      font:600 .68rem/1 var(--body,system-ui);letter-spacing:.12em;text-transform:uppercase;
+      color:var(--bone,#f4f1ea);background:var(--ink-2,#111113);border:1px solid var(--line,#26262b);
+      padding:.5rem .65rem;border-radius:var(--radius,4px);opacity:0;transform:translateX(-4px);
+      pointer-events:none;transition:opacity .2s,transform .2s}
+    .hs-music:hover::after{opacity:1;transform:translateX(0)}
+    @keyframes hsEq{0%,100%{height:5px}50%{height:16px}}
+    @media (max-width:560px){.hs-music{width:44px;height:44px;left:14px;bottom:14px}
+      .hs-music::after{display:none}}
+    ${reduceMotion ? ".hs-music .hs-eq span{animation:none;height:12px}" : ""}
+  `;
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "hs-music";
+  btn.setAttribute("aria-pressed", "false");
+  btn.setAttribute("aria-label", "Play background music");
+  btn.setAttribute("data-label", "Play the vibe");
+  btn.innerHTML =
+    '<span class="hs-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg></span>' +
+    '<span class="hs-eq" aria-hidden="true"><span></span><span></span><span></span><span></span></span>';
+
+  /* ---- audio engine: real file OR synth demo beat ----------- */
+  let playing = false;
+  let engine = null;
+
+  function buildFileEngine() {
+    const el = document.createElement("audio");
+    el.src = MUSIC.src;
+    el.loop = true;
+    el.preload = "none";
+    el.volume = MUSIC.volume;
+    return {
+      start: () => el.play(),                // returns a promise (may reject)
+      stop: () => el.pause(),
+    };
+  }
+
+  function buildSynthEngine() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return buildFileEngine(); // ancient browser fallback
+    let ctx, master, lp, timer = null, step = 0, nextTime = 0, noise;
+    const BPM = 78, sixteenth = 15 / BPM; // 60/BPM/4
+    // i–VI–III–VII in A minor: Am, F, C, G (roots + triads, low octave)
+    const bars = [
+      { bass: 110.00, chord: [220.00, 261.63, 329.63] },
+      { bass: 87.31,  chord: [174.61, 220.00, 261.63] },
+      { bass: 130.81, chord: [261.63, 329.63, 392.00] },
+      { bass: 98.00,  chord: [196.00, 246.94, 293.66] },
+    ];
+
+    function ensure() {
+      if (ctx) return;
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0;
+      lp = ctx.createBiquadFilter();
+      lp.type = "lowpass"; lp.frequency.value = 2000; lp.Q.value = 0.7;
+      master.connect(lp); lp.connect(ctx.destination);
+      const buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+      noise = buf;
+    }
+    function env(node, t, peak, dur) {
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(peak, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      node.connect(g); g.connect(master); return g;
+    }
+    function kick(t) {
+      const o = ctx.createOscillator(); o.type = "sine";
+      o.frequency.setValueAtTime(150, t);
+      o.frequency.exponentialRampToValueAtTime(50, t + 0.12);
+      env(o, t, 0.9, 0.2); o.start(t); o.stop(t + 0.22);
+    }
+    function hat(t, peak) {
+      const s = ctx.createBufferSource(); s.buffer = noise;
+      const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 7000;
+      s.connect(hp); env(hp, t, peak, 0.04); s.start(t); s.stop(t + 0.05);
+    }
+    function snare(t) {
+      const s = ctx.createBufferSource(); s.buffer = noise;
+      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1800; bp.Q.value = 0.9;
+      s.connect(bp); env(bp, t, 0.45, 0.16); s.start(t); s.stop(t + 0.18);
+    }
+    function tone(freq, t, peak, dur, type) {
+      const o = ctx.createOscillator(); o.type = type || "triangle"; o.frequency.value = freq;
+      env(o, t, peak, dur); o.start(t); o.stop(t + dur + 0.05);
+    }
+    function scheduleStep(s, t) {
+      const beat = s % 16, bar = bars[Math.floor(s / 16) % 4];
+      if (beat === 0 || beat === 8 || beat === 14) kick(t);     // bounce
+      if (beat === 4 || beat === 12) snare(t);                  // backbeat
+      if (s % 2 === 0) hat(t, beat % 4 === 0 ? 0.14 : 0.09);    // 8th-note hats
+      if (beat === 0) {                                         // chord + bass per bar
+        bar.chord.forEach((f) => tone(f, t, 0.06, sixteenth * 14, "sine"));
+        tone(bar.bass, t, 0.22, sixteenth * 6, "triangle");
+      }
+      if (beat === 8) tone(bar.bass, t, 0.18, sixteenth * 4, "triangle");
+    }
+    function loop() {
+      while (nextTime < ctx.currentTime + 0.12) {
+        scheduleStep(step, nextTime);
+        nextTime += sixteenth;
+        step = (step + 1) % 64;
+      }
+      timer = setTimeout(loop, 25);
+    }
+    return {
+      start: () => {
+        ensure();
+        return ctx.resume().then(() => {
+          master.gain.cancelScheduledValues(ctx.currentTime);
+          master.gain.linearRampToValueAtTime(MUSIC.volume, ctx.currentTime + 0.4);
+          if (timer == null) { nextTime = ctx.currentTime + 0.05; loop(); }
+        });
+      },
+      stop: () => {
+        if (!ctx) return;
+        master.gain.cancelScheduledValues(ctx.currentTime);
+        master.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.08);
+        clearTimeout(timer); timer = null;
+      },
+    };
+  }
+
+  function getEngine() {
+    if (!engine) engine = MUSIC.placeholder ? buildSynthEngine() : buildFileEngine();
+    return engine;
+  }
+
+  function setUI(on) {
+    playing = on;
+    btn.classList.toggle("is-on", on);
+    btn.setAttribute("aria-pressed", String(on));
+    btn.setAttribute("aria-label", on ? "Mute background music" : "Play background music");
+    btn.setAttribute("data-label", on ? "Mute" : "Play the vibe");
+  }
+
+  function play() {
+    Promise.resolve(getEngine().start())
+      .then(() => { setUI(true); try { sessionStorage.setItem(STORE_KEY, "1"); } catch (e) {} })
+      .catch(() => setUI(false)); // blocked by browser — stay off, wait for a tap
+  }
+  function stop() {
+    getEngine().stop();
+    setUI(false);
+    try { sessionStorage.setItem(STORE_KEY, "0"); } catch (e) {}
+  }
+
+  btn.addEventListener("click", () => (playing ? stop() : play()));
+
+  /* ---- resume across page changes (needs the next gesture) -- */
+  function wantsOn() { try { return sessionStorage.getItem(STORE_KEY) === "1"; } catch (e) { return false; } }
+  function init() {
+    document.head.appendChild(style);
+    document.body.appendChild(btn);
+    if (wantsOn()) {
+      play(); // works if the browser already trusts this site; otherwise:
+      const resume = () => { if (!playing && wantsOn()) play(); };
+      window.addEventListener("pointerdown", resume, { once: true });
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
