@@ -767,7 +767,7 @@ function flashAdd(btn) {
 (function () {
   const MUSIC = {
     src: "audio/track.mp3", // your royalty-free track goes here
-    placeholder: true,      // true = built-in demo beat | false = play the .mp3
+    placeholder: true,      // true = built-in NBA YoungBoy-style trap beat | false = play the .mp3
     volume: 0.32,           // 0–1, kept low so it sits under the page
   };
 
@@ -836,66 +836,87 @@ function flashAdd(btn) {
   function buildSynthEngine() {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return buildFileEngine(); // ancient browser fallback
-    let ctx, master, lp, timer = null, step = 0, nextTime = 0, noise;
-    const BPM = 78, sixteenth = 15 / BPM; // 60/BPM/4
-    // i–VI–III–VII in A minor: Am, F, C, G (roots + triads, low octave)
-    const bars = [
-      { bass: 110.00, chord: [220.00, 261.63, 329.63] },
-      { bass: 87.31,  chord: [174.61, 220.00, 261.63] },
-      { bass: 130.81, chord: [261.63, 329.63, 392.00] },
-      { bass: 98.00,  chord: [196.00, 246.94, 293.66] },
-    ];
+    let ctx, master, timer = null, step = 0, nextTime = 0, noise;
+    const BPM = 150, sixteenth = 15 / BPM; // ~0.1s — fast hats, half-time drums
+    // Dark melodic trap (NBA YoungBoy-style), A minor:
+    // i – VII – VI – V  →  Am, G, F, E  (somber descending; G# over E = tension)
+    const ROOTS = [55.00, 49.00, 43.65, 41.20]; // A1 G1 F1 E1 — sliding-808 roots
+    // sparse minor melody: 64-step grid → note frequency (Hz)
+    const MEL = {
+      0: 659.25, 4: 523.25, 8: 493.88, 10: 523.25, 12: 440.00, // Am: E5 C5 B4 C5 A4
+      16: 587.33, 20: 493.88, 24: 440.00, 28: 493.88,          // G : D5 B4 A4 B4
+      32: 523.25, 36: 440.00, 40: 392.00, 44: 440.00,          // F : C5 A4 G4 A4
+      48: 493.88, 52: 415.30, 56: 329.63, 60: 415.30,          // E : B4 G#4 E4 G#4
+    };
+    // soft-saturation curve → gives the 808 its grit
+    const sat = (() => {
+      const n = 1024, c = new Float32Array(n);
+      for (let i = 0; i < n; i++) { const x = (i / n) * 2 - 1; c[i] = Math.tanh(x * 2); }
+      return c;
+    })();
 
     function ensure() {
       if (ctx) return;
       ctx = new AC();
       master = ctx.createGain();
       master.gain.value = 0;
-      lp = ctx.createBiquadFilter();
-      lp.type = "lowpass"; lp.frequency.value = 2000; lp.Q.value = 0.7;
-      master.connect(lp); lp.connect(ctx.destination);
+      const comp = ctx.createDynamicsCompressor(); // glue + stop clipping
+      comp.threshold.value = -10; comp.knee.value = 6; comp.ratio.value = 4;
+      comp.attack.value = 0.003; comp.release.value = 0.2;
+      master.connect(comp); comp.connect(ctx.destination);
       const buf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
       const d = buf.getChannelData(0);
       for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
       noise = buf;
     }
-    function env(node, t, peak, dur) {
+    function env(node, t, peak, dur, atk) {
       const g = ctx.createGain();
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(peak, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(peak, t + (atk || 0.005));
       g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
       node.connect(g); g.connect(master); return g;
     }
-    function kick(t) {
+    function kick(t) { // hard trap kick
       const o = ctx.createOscillator(); o.type = "sine";
-      o.frequency.setValueAtTime(150, t);
-      o.frequency.exponentialRampToValueAtTime(50, t + 0.12);
-      env(o, t, 0.9, 0.2); o.start(t); o.stop(t + 0.22);
+      o.frequency.setValueAtTime(170, t);
+      o.frequency.exponentialRampToValueAtTime(48, t + 0.10);
+      env(o, t, 0.9, 0.34); o.start(t); o.stop(t + 0.36);
     }
-    function hat(t, peak) {
+    function sub808(freq, t, dur) { // 808 with a slide into the note
+      const o = ctx.createOscillator(); o.type = "sine";
+      o.frequency.setValueAtTime(freq * 1.5, t);
+      o.frequency.exponentialRampToValueAtTime(freq, t + 0.06);
+      const sh = ctx.createWaveShaper(); sh.curve = sat;
+      o.connect(sh); env(sh, t, 0.55, dur, 0.004); o.start(t); o.stop(t + dur + 0.05);
+    }
+    function clap(t) { // layered noise bursts = snappy clap on the backbeat
+      for (const off of [0, 0.012, 0.024]) {
+        const s = ctx.createBufferSource(); s.buffer = noise;
+        const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1700; bp.Q.value = 1.1;
+        s.connect(bp); env(bp, t + off, 0.4, 0.12, 0.001); s.start(t + off); s.stop(t + off + 0.14);
+      }
+    }
+    function hat(t, peak, len) { // crisp trap hi-hat
       const s = ctx.createBufferSource(); s.buffer = noise;
-      const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 7000;
-      s.connect(hp); env(hp, t, peak, 0.04); s.start(t); s.stop(t + 0.05);
+      const hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 8000;
+      s.connect(hp); env(hp, t, peak, len || 0.03, 0.001); s.start(t); s.stop(t + (len || 0.03) + 0.02);
     }
-    function snare(t) {
-      const s = ctx.createBufferSource(); s.buffer = noise;
-      const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 1800; bp.Q.value = 0.9;
-      s.connect(bp); env(bp, t, 0.45, 0.16); s.start(t); s.stop(t + 0.18);
-    }
-    function tone(freq, t, peak, dur, type) {
-      const o = ctx.createOscillator(); o.type = type || "triangle"; o.frequency.value = freq;
-      env(o, t, peak, dur); o.start(t); o.stop(t + dur + 0.05);
+    function bell(freq, t, dur) { // melody — two detuned triangles
+      [0, 7].forEach((det) => {
+        const o = ctx.createOscillator(); o.type = "triangle";
+        o.frequency.value = freq; o.detune.value = det;
+        env(o, t, 0.13, dur, 0.012); o.start(t); o.stop(t + dur + 0.05);
+      });
     }
     function scheduleStep(s, t) {
-      const beat = s % 16, bar = bars[Math.floor(s / 16) % 4];
-      if (beat === 0 || beat === 8 || beat === 14) kick(t);     // bounce
-      if (beat === 4 || beat === 12) snare(t);                  // backbeat
-      if (s % 2 === 0) hat(t, beat % 4 === 0 ? 0.14 : 0.09);    // 8th-note hats
-      if (beat === 0) {                                         // chord + bass per bar
-        bar.chord.forEach((f) => tone(f, t, 0.06, sixteenth * 14, "sine"));
-        tone(bar.bass, t, 0.22, sixteenth * 6, "triangle");
-      }
-      if (beat === 8) tone(bar.bass, t, 0.18, sixteenth * 4, "triangle");
+      const b = s % 16, root = ROOTS[Math.floor(s / 16) % 4];
+      if (b === 0 || b === 10) kick(t);                 // half-time: boom .. b-boom
+      if (b === 8) clap(t);                             // backbeat clap
+      hat(t, b % 4 === 0 ? 0.22 : 0.12);                // 16th-note trap hats
+      if (b === 7 || b === 14 || b === 15) hat(t + sixteenth / 2, 0.10); // 32nd rolls
+      if (b === 0) sub808(root, t, sixteenth * 9);      // 808 follows the root
+      if (b === 10) sub808(root, t, sixteenth * 6);
+      if (MEL[s]) bell(MEL[s], t, sixteenth * 3.5);     // melody
     }
     function loop() {
       while (nextTime < ctx.currentTime + 0.12) {
