@@ -1,8 +1,8 @@
 # ============================================================
 #  SUPER RESELLS — admin dashboard config (Decap CMS)
 #  This powers the dashboard at /admin where the store is managed.
-#  After connecting GitHub + Netlify, set "branch" below to your
-#  repo's default branch if it isn't "main".
+#  Hosted on Cloudflare Pages (super-resells.pages.dev), auto-deploys
+#  from this GitHub repo's "main" branch.
 # ============================================================
 backend:
   name: github               # log in with a GitHub Personal Access Token
@@ -15,9 +15,9 @@ public_folder: "/images/p"
 
 # Friendlier editor experience
 publish_mode: simple
-site_url: https://superresells.netlify.app
-display_url: https://superresells.netlify.app
-logo_url: https://superresells.netlify.app/images/social-card.svg
+site_url: https://super-resells.pages.dev
+display_url: https://super-resells.pages.dev
+logo_url: https://super-resells.pages.dev/images/social-card.svg
 
 collections:
   # -------- PRODUCTS --------
