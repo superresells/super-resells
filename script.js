@@ -273,13 +273,16 @@ function stockLine(p) {
   return `<div class="stock-line"><span class="dot"></span>${n} in stock</div>`;
 }
 
-function productCard(p) {
+function productCard(p, i = 0) {
   const scarce = /last|limited|left/i.test(p.badge || "") ? " scarce" : "";
   const badge = p.badge ? `<span class="card-badge${scarce}">${p.badge}</span>` : "";
   // Front img sits on top of the placeholder; if it 404s we hide it and the placeholder shows.
   // Back img (if any) layers on top and cross-fades in on hover.
+  // First row (i < 4) loads eagerly so the shop's LCP image isn't deferred by lazy-loading;
+  // the very first image also gets high fetch priority. Everything below the fold stays lazy.
+  const front = `loading="${i < 4 ? "eager" : "lazy"}"${i === 0 ? ' fetchpriority="high"' : ""} decoding="async"`;
   const img = p.img
-    ? `<img class="card-front" src="${p.img}" alt="${p.name}" loading="lazy" decoding="async" onerror="this.style.display='none';this.closest('.card-media').classList.add('placeholder')">${p.back ? `<img class="card-back" src="${p.back}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : ""}`
+    ? `<img class="card-front" src="${p.img}" alt="${p.name}" ${front} onerror="this.style.display='none';this.closest('.card-media').classList.add('placeholder')">${p.back ? `<img class="card-back" src="${p.back}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : ""}`
     : "";
   const addBtn = sizesFor(p).length > 1
     ? `<button class="add-btn" data-pick="${p.id}">${PLUS_ICON} Add</button>`
@@ -307,7 +310,7 @@ function productCard(p) {
 function renderGrid(target, list) {
   const el = $(target);
   if (!el) return;
-  el.innerHTML = list.map(productCard).join("");
+  el.innerHTML = list.map((p, i) => productCard(p, i)).join("");
   observeReveals(el);
 }
 

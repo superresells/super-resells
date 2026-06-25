@@ -43,3 +43,23 @@
 
 /brand-kit.html
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://formspree.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://formspree.io; object-src 'none'
+
+# ─────────────────────────────────────────────────────────────
+#  Caching for static assets. Filenames aren't content-hashed, so we
+#  keep TTLs modest and pair them with stale-while-revalidate: repeat
+#  visits and page-to-page navigation reuse cached assets instead of
+#  re-downloading, while deploys still propagate quickly.
+#  NOTE: /data/*.json is intentionally NOT cached here so CMS edits
+#  (products, reviews, settings) go live immediately.
+# ─────────────────────────────────────────────────────────────
+/images/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/style.css
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/script.js
+  Cache-Control: public, max-age=3600, stale-while-revalidate=86400
+
+/audio/*
+  Cache-Control: public, max-age=604800

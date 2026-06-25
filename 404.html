@@ -3,19 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop — SUPER RESELLS | Premium Tees, Hoodies & More</title>
-  <meta name="description" content="Shop SUPER RESELLS — hand-picked premium graphic tees, one-of-a-few drops. Stack the cart for automatic savings. Ships nationwide.">
+  <title>Page Not Found — SUPER RESELLS</title>
+  <meta name="robots" content="noindex">
   <meta name="theme-color" content="#0a0a0b">
-  <meta property="og:title" content="Shop — SUPER RESELLS">
-  <meta property="og:description" content="Hand-picked graphic heat. Stack the cart, save more — automatically.">
-  <meta property="og:url" content="https://super-resells.pages.dev/shop.html">
-  <meta property="og:image" content="https://super-resells.pages.dev/images/social-card.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="SUPER RESELLS — hand-picked heat, ships nationwide, as low as $22 a piece">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://super-resells.pages.dev/images/social-card.jpg">
-  <link rel="canonical" href="https://super-resells.pages.dev/shop.html">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +24,7 @@
     <button class="nav-toggle" aria-label="Toggle menu" aria-expanded="false"><span></span><span></span><span></span></button>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
-      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="shop.html">Shop</a></li>
       <li><a href="index.html#bulk">Stack & Save</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="contact.html">Contact</a></li>
@@ -48,31 +38,16 @@
   </nav>
 </header>
 
-<!-- PAGE HEAD -->
-<section class="page-head">
+<!-- 404 -->
+<section class="page-head" style="min-height:62vh;display:grid;place-items:center;text-align:center">
   <div class="container reveal">
-    <span class="eyebrow">The Collection</span>
-    <h1>Shop the Heat</h1>
-    <p class="lead">Every piece is hand-picked premium. Stack what you want — <b style="color:var(--gold)">the price drops automatically</b> with every piece you add. One-of-a-few inventory, so grab it while it's here.</p>
-  </div>
-</section>
-
-<!-- BULK REMINDER BAR -->
-<div class="trust">
-  <div class="container trust-inner">
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 2 for $85</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 3 for $120</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 6 for $180</div>
-    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12H4M14 6l6 6-6 6"/></svg> 12 for $300</div>
-  </div>
-</div>
-
-<!-- PRODUCT GRID -->
-<section class="section">
-  <div class="container">
-    <div class="shop-toolbar" id="shopToolbar"></div>
-    <div class="grid-products" id="shopGrid"></div>
-    <p class="form-hint" style="margin-top:2.5rem">Looking for something specific or a piece you saw on our IG? <a href="contact.html" style="color:var(--gold)">DM us — we'll source it →</a></p>
+    <span class="eyebrow">Error 404</span>
+    <h1>This drop's gone.</h1>
+    <p class="lead" style="margin:1rem auto 0">The page you're after moved, sold out, or never existed. The heat's still on the wall — go cop something nobody else has.</p>
+    <div class="hero-actions" style="justify-content:center;margin-top:2rem">
+      <a href="shop.html" class="btn btn-gold btn-lg">Shop the Heat →</a>
+      <a href="index.html" class="btn btn-ghost btn-lg">Back Home</a>
+    </div>
   </div>
 </section>
 
@@ -105,12 +80,6 @@
 
 <!-- MODAL -->
 <div class="modal-scrim" id="modalScrim"><div class="modal" id="modalContent"></div></div>
-
-<!-- MOBILE STICKY CTA -->
-<div class="mobile-cta">
-  <button class="btn btn-gold" data-open-cart>View Order</button>
-  <a href="contact.html" class="btn btn-ghost">Custom?</a>
-</div>
 
 <script src="script.js"></script>
 </body>

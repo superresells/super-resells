@@ -1,0 +1,6 @@
+# SUPER RESELLS — https://super-resells.pages.dev
+User-agent: *
+Allow: /
+Disallow: /admin/
+
+Sitemap: https://super-resells.pages.dev/sitemap.xml
