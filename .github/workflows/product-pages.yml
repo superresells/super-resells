@@ -1,0 +1,38 @@
+name: Build product pages
+
+# Whenever products change (e.g. an add/edit/delete in the /admin CMS writes
+# data/products.json), regenerate the per-product SEO pages under /product and
+# refresh sitemap.xml. Stdlib Python only — no install step.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/products.json'
+      - 'data/settings.json'
+      - 'scripts/build_products.py'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate product pages + sitemap
+        run: python3 scripts/build_products.py
+
+      - name: Commit if changed
+        run: |
+          if [ -z "$(git status --porcelain product sitemap.xml)" ]; then
+            echo "No product/sitemap changes."; exit 0
+          fi
+          git config user.name "superresells-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add product sitemap.xml
+          # [skip ci] stops re-trigger; Cloudflare still deploys the result.
+          git commit -m "Rebuild product pages + sitemap [skip ci]"
+          git push || (git pull --rebase origin main && git push)

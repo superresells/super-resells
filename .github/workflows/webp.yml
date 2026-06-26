@@ -49,4 +49,4 @@ jobs:
           git add images/p/*.webp
           # [skip ci] stops this commit from re-triggering the workflow (Cloudflare still deploys it).
           git commit -m "Auto-generate WebP for new product photos [skip ci]"
-          git push
+          git push || (git pull --rebase origin main && git push)

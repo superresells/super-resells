@@ -152,6 +152,13 @@ async function loadData() {
     if (seen[id]) id += "-" + i;
     seen[id] = true; p.id = id;
   });
+  // stable URL slug per product (matches scripts/build_products.py → /product/<slug>)
+  const slugSeen = {};
+  PRODUCTS.forEach(p => {
+    let s = (p.name || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "piece";
+    const n = (slugSeen[s] || 0) + 1; slugSeen[s] = n;
+    p._slug = n === 1 ? s : `${s}-${n}`;
+  });
   if (settings) applySettings(settings);
 }
 
@@ -306,7 +313,7 @@ function productCard(p, i = 0) {
       <button class="card-quick" data-quick="${p.id}">Quick View</button>
     </div>
     <div class="card-body">
-      <div class="card-name">${p.name}</div>
+      <a class="card-name" href="/product/${p._slug}">${p.name}</a>
       <div class="card-meta">${p.colors} · ${sizesFor(p).join(" / ")}</div>
       ${stockLine(p)}
       <div class="card-foot">
@@ -449,6 +456,7 @@ function quickView(id) {
     <div class="modal-body">
       ${gallery}
       <p class="lead" style="margin-bottom:1.2rem">${p.desc}</p>
+      <a href="/product/${p._slug}" class="qv-fulllink">View full details →</a>
       <span class="sz-label">${sizes.length > 1 ? "Select size" : "Size"}</span>
       <div class="sz-row">${pills}</div>
       ${guide}
@@ -887,7 +895,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // global click delegation
   document.addEventListener("click", e => {
     const sz = e.target.closest("[data-sz]");
-    if (sz) { sz.parentElement.querySelectorAll(".sz-pill").forEach(b => b.classList.remove("active")); sz.classList.add("active"); const ab = document.querySelector("#modalContent [data-add]"); if (ab) ab.dataset.size = sz.dataset.sz; return; }
+    if (sz) { sz.parentElement.querySelectorAll(".sz-pill").forEach(b => b.classList.remove("active")); sz.classList.add("active"); const scope = sz.closest("#modalContent") || sz.closest("[data-pdp]") || document; const ab = scope.querySelector("[data-add]"); if (ab) ab.dataset.size = sz.dataset.sz; return; }
     const add = e.target.closest("[data-add]");
     if (add) { addToCart(add.dataset.add, add.dataset.size); flashAdd(add); if (add.hasAttribute("data-add-close")) { closeModal(); openDrawer(); } return; }
     const pick = e.target.closest("[data-pick]"); if (pick) { quickView(pick.dataset.pick); return; }
