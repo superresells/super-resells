@@ -1,0 +1,52 @@
+name: Auto-WebP product photos
+
+# When a new/updated product photo (JPG/PNG) lands in images/p — e.g. uploaded
+# through the /admin CMS — generate a matching .webp so the storefront keeps
+# serving the smaller format. The site falls back to the original file if a
+# .webp is missing, so this is purely an optimization: nothing breaks if it
+# doesn't run, and it never touches a photo that already has a .webp.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'images/p/*.jpg'
+      - 'images/p/*.jpeg'
+      - 'images/p/*.png'
+      - 'images/p/*.JPG'
+      - 'images/p/*.JPEG'
+      - 'images/p/*.PNG'
+  workflow_dispatch: {}   # lets you run it by hand from the Actions tab too
+
+permissions:
+  contents: write
+
+jobs:
+  webp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install cwebp
+        run: sudo apt-get update && sudo apt-get install -y webp
+
+      - name: Generate any missing WebP files
+        run: |
+          changed=0
+          while IFS= read -r -d '' img; do
+            webp="${img%.*}.webp"
+            if [ ! -f "$webp" ]; then
+              cwebp -quiet -q 80 "$img" -o "$webp" && { echo "converted -> $webp"; changed=1; }
+            fi
+          done < <(find images/p -maxdepth 1 -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) -print0)
+          echo "CHANGED=$changed" >> "$GITHUB_ENV"
+
+      - name: Commit new WebP files
+        if: env.CHANGED == '1'
+        run: |
+          git config user.name "superresells-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add images/p/*.webp
+          # [skip ci] stops this commit from re-triggering the workflow (Cloudflare still deploys it).
+          git commit -m "Auto-generate WebP for new product photos [skip ci]"
+          git push

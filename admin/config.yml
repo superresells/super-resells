@@ -40,11 +40,11 @@ collections:
               - { name: name, label: "Title / Name", widget: string }
               - { name: id, label: "ID (auto-generated)", widget: uuid, prefix: "hs-" }
               - { name: price, label: "Price ($)", widget: number, default: 50, value_type: int, min: 1 }
-              - { name: cat, label: "Color", widget: select, options: ["Black", "White", "Blue", "Tan"], default: "Black" }
+              - { name: cat, label: "Color", widget: select, options: ["Black", "White", "Grey", "Blue", "Red", "Green", "Purple", "Pink", "Tan", "Brown", "Multi"], default: "Black", hint: "Drives the color filter on the shop page. Pick the closest." }
               - { name: badge, label: "Badge", widget: select, required: false, default: "", options: ["", "Just Dropped", "Best Seller", "Last One", "Limited"] }
               - { name: sizes, label: "Sizes IN STOCK", widget: select, multiple: true, default: ["M"], options: ["S", "M", "L", "XL", "2XL", "One Size"], hint: "Uncheck a size the moment it sells out." }
-              - { name: img, label: "Front photo", widget: image, required: false, choose_url: false }
-              - { name: back, label: "Back photo (shows on hover)", widget: image, required: false, choose_url: false }
+              - { name: img, label: "Front photo", widget: image, required: false, choose_url: false, hint: "Front of the shirt. Any size — phone photos are fine; it's shown cropped to a tall card and auto-optimized to WebP." }
+              - { name: back, label: "Back photo (shows on hover)", widget: image, required: false, choose_url: false, hint: "Optional. Appears when a shopper hovers over the card on the shop page." }
               - { name: colors, label: "Print description", widget: string, required: false, hint: "e.g. Black · Pink print" }
               - { name: desc, label: "Description", widget: text, required: false }
 
