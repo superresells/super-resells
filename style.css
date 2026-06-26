@@ -206,6 +206,16 @@ h3 { font-size: clamp(1.3rem, 3vw, 1.8rem); }
 @keyframes shimmer { 100% { transform: translateX(100%); } }
 @media (prefers-reduced-motion: reduce) { .skel-media::after, .skel-line::after { animation: none; } }
 
+/* ----- Drop-list signup ----- */
+.drop-band { border-block: 1px solid var(--line); background: radial-gradient(120% 80% at 50% 0%, rgba(200,162,76,.06), transparent 60%); }
+.drop-form { display: flex; gap: .6rem; max-width: 440px; margin: 1.6rem auto .2rem; }
+.drop-form input { flex: 1; min-width: 0; padding: .9rem 1rem; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius); color: var(--bone); font: inherit; }
+.drop-form input::placeholder { color: var(--muted-2); }
+.drop-form input:focus { outline: none; border-color: var(--gold); }
+.drop-form .btn { flex: none; }
+.drop-success { margin: 1.6rem auto 0; font-size: 1.05rem; color: var(--good); font-weight: 600; }
+@media (max-width: 480px) { .drop-form { flex-direction: column; } .drop-form .btn { width: 100%; justify-content: center; } }
+
 .card {
   background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; display: flex; flex-direction: column;

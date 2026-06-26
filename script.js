@@ -787,6 +787,41 @@ function initShopFilters() {
 }
 
 /* ============================================================
+   Drop-list signup — "notify me on the next drop"
+   Posts to Formspree (lands in the owner's inbox) so an audience can be
+   built now; swap in a real mailer later without touching the markup.
+   ============================================================ */
+async function submitDropAlert(e) {
+  e.preventDefault();
+  const form = e.target;
+  const email = (form.email.value || "").trim();
+  if (!email) { form.reportValidity?.(); return; }
+  const btn = form.querySelector("button[type=submit]");
+  btn.textContent = "Adding…"; btn.disabled = true;
+  let sent = false;
+  if (FORMSPREE_ID) {
+    try {
+      const fd = new FormData();
+      fd.append("email", email);
+      fd.append("list", "Drop alerts");
+      fd.append("_subject", `New drop-list signup — ${BIZ.name}`);
+      const r = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, { method: "POST", headers: { Accept: "application/json" }, body: fd });
+      sent = r.ok;
+    } catch { sent = false; }
+  }
+  if (sent) {
+    const hint = form.nextElementSibling;
+    form.insertAdjacentHTML("afterend", `<p class="drop-success">★ You're on the list — you'll hear about the next drop first.</p>`);
+    form.remove();
+    if (hint && hint.classList.contains("form-hint")) hint.remove();
+  } else {
+    const mailto = `mailto:${ORDER_EMAIL}?subject=${encodeURIComponent("Add me to the drop list")}&body=${encodeURIComponent("Add me to the SUPER RESELLS drop list: " + email)}`;
+    btn.disabled = false; btn.textContent = "Notify Me →";
+    showToast(`<div class="toast-title">One more tap</div><div class="toast-body"><a href="${mailto}" style="color:var(--gold);text-decoration:underline">Send the email</a> to finish signing up.</div>`);
+  }
+}
+
+/* ============================================================
    Boot
    ============================================================ */
 document.addEventListener("DOMContentLoaded", async () => {
@@ -815,6 +850,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   renderReviews();
   renderSold();
   renderSocial();
+  $$(".drop-form").forEach(f => f.addEventListener("submit", submitDropAlert));
   observeReveals();
 
   // nav toggle
