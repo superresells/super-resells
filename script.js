@@ -333,6 +333,31 @@ function renderSkeletons(target, n) {
     `<div class="card skel" aria-hidden="true"><div class="skel-media"></div><div class="skel-body"><div class="skel-line w70"></div><div class="skel-line w40"></div><div class="skel-line w50"></div></div></div>`).join("");
 }
 
+/* ----- "Complete your stack" cross-sell (cart drawer) ----- */
+const ssSize = p => { const s = sizesFor(p); return s.includes("M") ? "M" : s[0]; };
+function stackSuggestions(n = 3) {
+  const inCart = new Set(cart.map(l => l.id));
+  const pool = PRODUCTS.filter(p => !inCart.has(p.id) && sizesFor(p).length);
+  pool.sort((a, b) => (b.badge === "Just Dropped") - (a.badge === "Just Dropped")); // fresh heat first
+  return pool.slice(0, n);
+}
+function stackSuggestHTML(next) {
+  if (!next) return "";                       // already at top tier — nothing to upsell
+  const sugg = stackSuggestions(3);
+  if (!sugg.length) return "";
+  const items = sugg.map(p => {
+    const thumb = p.img
+      ? `<img src="${webpOf(p.img)}" data-fb="${p.img}" alt="" loading="lazy" onerror="imgFallback(this)">`
+      : `<span class="ss-ph">${p.name}</span>`;
+    return `<button class="ss-item" data-add="${p.id}" data-size="${ssSize(p)}" aria-label="Add ${p.name}">
+      <span class="ss-thumb">${thumb}</span>
+      <span class="ss-name">${p.name}</span>
+      <span class="ss-plus">+ Add</span>
+    </button>`;
+  }).join("");
+  return `<div class="stack-suggest"><div class="ss-head">Complete your stack</div><div class="ss-row">${items}</div></div>`;
+}
+
 /* ============================================================
    Cart drawer render
    ============================================================ */
@@ -388,6 +413,7 @@ function renderCart() {
 
   foot.innerHTML = `
     ${t.qty > 1 ? nudge : ""}
+    ${stackSuggestHTML(next)}
     ${t.saved > 0 ? `<div class="drawer-discount"><span>Stack savings (${t.qty} pieces)</span><span>−${money(t.saved)}</span></div>` : ""}
     <div class="drawer-subtotal"><span class="label">Estimated total</span><span class="val">${money(t.total)}</span></div>
     <p class="drawer-note">${t.qty > 1 ? `That's <b style="color:var(--gold)">${money(t.each)}</b> a piece. ` : ""}No payment now — send your order and we confirm availability + total before you pay.</p>

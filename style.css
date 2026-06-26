@@ -216,6 +216,18 @@ h3 { font-size: clamp(1.3rem, 3vw, 1.8rem); }
 .drop-success { margin: 1.6rem auto 0; font-size: 1.05rem; color: var(--good); font-weight: 600; }
 @media (max-width: 480px) { .drop-form { flex-direction: column; } .drop-form .btn { width: 100%; justify-content: center; } }
 
+/* ----- "Complete your stack" cross-sell (cart drawer) ----- */
+.stack-suggest { margin: .1rem 0 1rem; }
+.ss-head { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .55rem; }
+.ss-row { display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .25rem; scrollbar-width: thin; }
+.ss-item { flex: 0 0 86px; display: flex; flex-direction: column; gap: .3rem; text-align: left; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius); padding: .4rem; cursor: pointer; transition: border-color .2s; color: inherit; }
+.ss-item:hover { border-color: var(--gold); }
+.ss-thumb { display: block; aspect-ratio: 1/1; border-radius: 3px; overflow: hidden; background: var(--ink-3); }
+.ss-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.ss-ph { display: grid; place-items: center; height: 100%; font-size: .52rem; line-height: 1.2; color: var(--muted-2); text-align: center; padding: .2rem; }
+.ss-name { font-size: .62rem; line-height: 1.25; color: var(--bone); height: 2.5em; overflow: hidden; }
+.ss-plus { font-size: .6rem; letter-spacing: .06em; text-transform: uppercase; color: var(--gold); font-weight: 700; }
+
 .card {
   background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; display: flex; flex-direction: column;
