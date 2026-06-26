@@ -180,6 +180,32 @@ h3 { font-size: clamp(1.3rem, 3vw, 1.8rem); }
 .chip:hover { color: var(--bone); border-color: var(--muted); }
 .chip.active { background: var(--gold-grad); color: #1a1505; border-color: transparent; font-weight: 600; }
 
+/* ----- Shop filters (size / color / drop) ----- */
+.shop-toolbar { align-items: center; column-gap: 1.3rem; row-gap: .7rem; }
+.filter-group { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.filter-label { font-size: .66rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.filter-chips { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip.drop-chip.active { background: var(--gold-grad); color: #1a1505; border-color: transparent; font-weight: 600; }
+.filter-count { width: 100%; text-align: center; font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted-2); }
+.shop-empty { grid-column: 1 / -1; display: grid; gap: 1rem; place-items: center; text-align: center; padding: 3.5rem 1rem; color: var(--muted); }
+
+/* ----- Per-card trust line + quick-view assurance ----- */
+.card-assure { display: flex; align-items: center; gap: .4rem; margin-top: .15rem; font-size: .64rem; letter-spacing: .07em; text-transform: uppercase; color: var(--muted-2); font-weight: 600; }
+.card-assure svg { width: 12px; height: 12px; color: var(--good); flex: none; }
+.qv-assure { display: flex; align-items: flex-start; gap: .55rem; margin-top: .9rem; font-size: .85rem; line-height: 1.5; color: var(--muted); }
+.qv-assure svg { width: 16px; height: 16px; color: var(--good); flex: none; margin-top: .15rem; }
+.qv-assure b { color: var(--bone); }
+
+/* ----- Loading skeletons (prevents grid pop-in) ----- */
+.card.skel { pointer-events: none; }
+.skel-media { aspect-ratio: 4/5; background: var(--ink-3); position: relative; overflow: hidden; }
+.skel-body { padding: 1.1rem; display: flex; flex-direction: column; gap: .6rem; }
+.skel-line { height: .75rem; border-radius: 4px; background: var(--ink-3); position: relative; overflow: hidden; }
+.skel-line.w70 { width: 70%; } .skel-line.w40 { width: 40%; } .skel-line.w50 { width: 50%; }
+.skel-media::after, .skel-line::after { content: ""; position: absolute; inset: 0; transform: translateX(-100%); background: linear-gradient(90deg, transparent, rgba(244,241,234,.05), transparent); animation: shimmer 1.3s infinite; }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) { .skel-media::after, .skel-line::after { animation: none; } }
+
 .card {
   background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--radius-lg);
   overflow: hidden; display: flex; flex-direction: column;

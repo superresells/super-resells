@@ -264,6 +264,16 @@ function maybeStackToast(prev, now) {
    ============================================================ */
 const PLUS_ICON = `<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>`;
 
+// Prefer WebP (smaller); fall back to the original file, then the placeholder, on 404.
+// Used via inline onerror so it survives CMS-added products that only have a .jpg.
+const webpOf = src => (src || "").replace(/\.(jpe?g|png)$/i, ".webp");
+function imgFallback(el) {
+  const fb = el.getAttribute("data-fb");
+  if (fb && !el.src.endsWith(fb)) { el.removeAttribute("data-fb"); el.src = fb; return; }
+  el.style.display = "none";
+  if (el.classList.contains("card-front")) el.closest(".card-media")?.classList.add("placeholder");
+}
+
 // Live scarcity readout. We treat each in-stock size as 1 unit (resale = 1-of-1
 // per size). Single-piece pieces get a pulsing urgency cue.
 function stockLine(p) {
@@ -282,7 +292,7 @@ function productCard(p, i = 0) {
   // the very first image also gets high fetch priority. Everything below the fold stays lazy.
   const front = `loading="${i < 4 ? "eager" : "lazy"}"${i === 0 ? ' fetchpriority="high"' : ""} decoding="async"`;
   const img = p.img
-    ? `<img class="card-front" src="${p.img}" alt="${p.name}" ${front} onerror="this.style.display='none';this.closest('.card-media').classList.add('placeholder')">${p.back ? `<img class="card-back" src="${p.back}" alt="" aria-hidden="true" loading="lazy" decoding="async">` : ""}`
+    ? `<img class="card-front" src="${webpOf(p.img)}" data-fb="${p.img}" alt="${p.name}" ${front} onerror="imgFallback(this)">${p.back ? `<img class="card-back" src="${webpOf(p.back)}" data-fb="${p.back}" alt="" aria-hidden="true" loading="lazy" decoding="async" onerror="imgFallback(this)">` : ""}`
     : "";
   const addBtn = sizesFor(p).length > 1
     ? `<button class="add-btn" data-pick="${p.id}">${PLUS_ICON} Add</button>`
@@ -303,6 +313,7 @@ function productCard(p, i = 0) {
         <div class="card-price">${money(p.price)} <small>/ each</small></div>
         ${addBtn}
       </div>
+      <div class="card-assure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>No pay 'til confirmed</div>
     </div>
   </article>`;
 }
@@ -312,6 +323,14 @@ function renderGrid(target, list) {
   if (!el) return;
   el.innerHTML = list.map((p, i) => productCard(p, i)).join("");
   observeReveals(el);
+}
+
+// Placeholder shimmer cards shown while CMS data loads (prevents grid pop-in / CLS).
+function renderSkeletons(target, n) {
+  const el = $(target);
+  if (!el) return;
+  el.innerHTML = Array.from({ length: n }, () =>
+    `<div class="card skel" aria-hidden="true"><div class="skel-media"></div><div class="skel-body"><div class="skel-line w70"></div><div class="skel-line w40"></div><div class="skel-line w50"></div></div></div>`).join("");
 }
 
 /* ============================================================
@@ -395,8 +414,8 @@ function quickView(id) {
   const pills = sizes.map(s => `<button class="sz-pill ${s === def ? "active" : ""}" data-sz="${s}">${s}</button>`).join("");
   const guide = sizes.length > 1 ? sizeGuideHTML() : "";
   const gallery = p.img ? `<div class="qv-gallery">
-      <figure><img src="${p.img}" alt="${p.name} front" loading="lazy"><figcaption>Front</figcaption></figure>
-      ${p.back ? `<figure><img src="${p.back}" alt="${p.name} back" loading="lazy"><figcaption>Back</figcaption></figure>` : ""}
+      <figure><img src="${webpOf(p.img)}" data-fb="${p.img}" alt="${p.name} front" loading="lazy" onerror="imgFallback(this)"><figcaption>Front</figcaption></figure>
+      ${p.back ? `<figure><img src="${webpOf(p.back)}" data-fb="${p.back}" alt="${p.name} back" loading="lazy" onerror="imgFallback(this)"><figcaption>Back</figcaption></figure>` : ""}
     </div>` : "";
   openModal(`
     <div class="modal-head"><div><h3>${p.name}</h3><p>${p.colors}</p></div>
@@ -413,6 +432,7 @@ function quickView(id) {
         <div class="os-line"><span>Stack 10+</span><span style="color:var(--gold)">${money(eachForQty(10))} each</span></div>
       </div>
       <button class="btn btn-gold btn-block btn-lg" data-add="${p.id}" data-size="${def}" data-add-close>Add to Order — ${money(p.price)}</button>
+      <p class="qv-assure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span><b>No payment now.</b> Send your order and pay only once we confirm it's yours — zero risk.</span></p>
       <p class="form-hint">Stack the cart with any pieces and the price per shirt drops automatically.</p>
     </div>`);
 }
@@ -721,16 +741,49 @@ function observeReveals(root = document) {
    Shop filtering
    ============================================================ */
 function initShopFilters() {
-  const bar = $("#shopToolbar");
-  if (!bar) return;
-  const cats = ["All", ...new Set(PRODUCTS.map(p => p.cat))];
-  bar.innerHTML = cats.map((c, i) => `<button class="chip ${i === 0 ? "active" : ""}" data-filter="${c}">${c}</button>`).join("");
+  const bar = $("#shopToolbar"), grid = $("#shopGrid");
+  if (!bar || !grid) return;
+  const ORDER = ["S", "M", "L", "XL", "2XL", "One Size"];
+  const sizes = ORDER.filter(s => PRODUCTS.some(p => sizesFor(p).includes(s)));
+  const colors = [...new Set(PRODUCTS.map(p => p.cat))];
+  const hasDrops = PRODUCTS.some(p => p.badge === "Just Dropped");
+  const state = { size: "All", color: "All", drop: false };
+
+  const chip = (dim, val, label, active) => `<button class="chip${active ? " active" : ""}" data-dim="${dim}" data-val="${val}">${label}</button>`;
+  const grp = (label, inner) => `<div class="filter-group"><span class="filter-label">${label}</span><div class="filter-chips">${inner}</div></div>`;
+
+  bar.innerHTML =
+    grp("Size", chip("size", "All", "All", true) + sizes.map(s => chip("size", s, s, false)).join("")) +
+    grp("Color", chip("color", "All", "All", true) + colors.map(c => chip("color", c, c, false)).join("")) +
+    (hasDrops ? `<div class="filter-group"><button class="chip drop-chip" data-dim="drop" data-val="drop">★ Just Dropped</button></div>` : "") +
+    `<div class="filter-count" id="filterCount"></div>`;
+
+  function apply() {
+    const list = PRODUCTS.filter(p =>
+      (state.color === "All" || p.cat === state.color) &&
+      (state.size === "All" || sizesFor(p).includes(state.size)) &&
+      (!state.drop || p.badge === "Just Dropped"));
+    if (list.length) renderGrid("#shopGrid", list);
+    else grid.innerHTML = `<div class="shop-empty"><p>No pieces match that combo — try another size or color.</p><button class="btn btn-ghost" data-reset>Clear filters</button></div>`;
+    const c = $("#filterCount");
+    if (c) c.textContent = `${list.length} ${list.length === 1 ? "piece" : "pieces"}`;
+  }
+
   bar.addEventListener("click", e => {
-    const btn = e.target.closest("[data-filter]"); if (!btn) return;
-    $$(".chip", bar).forEach(c => c.classList.remove("active")); btn.classList.add("active");
-    const f = btn.dataset.filter;
-    renderGrid("#shopGrid", f === "All" ? PRODUCTS : PRODUCTS.filter(p => p.cat === f));
+    const btn = e.target.closest("[data-dim]"); if (!btn) return;
+    const { dim, val } = btn.dataset;
+    if (dim === "drop") { state.drop = !state.drop; btn.classList.toggle("active", state.drop); }
+    else { state[dim] = val; $$(`[data-dim="${dim}"]`, bar).forEach(c => c.classList.toggle("active", c === btn)); }
+    apply();
   });
+  grid.addEventListener("click", e => {
+    if (!e.target.closest("[data-reset]")) return;
+    state.size = "All"; state.color = "All"; state.drop = false;
+    $$(".chip", bar).forEach(c => c.classList.toggle("active", c.dataset.val === "All"));
+    apply();
+  });
+
+  apply();
 }
 
 /* ============================================================
@@ -745,13 +798,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   // reveal static above-the-fold content right away (don't wait on the data fetch)
   observeReveals();
 
+  // skeleton cards while CMS data loads — keeps the grids from popping in (CLS)
+  renderSkeletons("#featuredGrid", 4);
+  renderSkeletons("#shopGrid", 8);
+
   // pull CMS-managed content, then build the cart (needs products to exist)
   await loadData();
   cart = load();
 
   // render grids
   renderGrid("#featuredGrid", PRODUCTS.filter(p => p.badge === "Just Dropped" || p.badge === "Best Seller").slice(0, 4));
-  if ($("#shopGrid")) { renderGrid("#shopGrid", PRODUCTS); initShopFilters(); }
+  if ($("#shopGrid")) { initShopFilters(); }
 
   renderCart();
   initBulkCalc();
